@@ -1,6 +1,7 @@
 package olhovivo
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -79,6 +80,25 @@ func (ov *OlhoVivo) request(method, path string, params url.Values) (resp *http.
 	}
 
 	return ov.httpClient.Do(req)
+}
+
+func (ov *OlhoVivo) requestJSON(v interface{}, method, path string, params url.Values) (err error) {
+	resp, err := ov.request(method, path, params)
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return errors.Wrap(err, "error while reading response body")
+	}
+
+	defer resp.Body.Close()
+	if err := json.Unmarshal(body, &v); err != nil {
+		return errors.Wrap(err, "error while unmarshaling response body")
+	}
+
+	return
 }
 
 func (ov *OlhoVivo) setupHttpClient(shouldAuth bool) (err error) {

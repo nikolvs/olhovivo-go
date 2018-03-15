@@ -13,14 +13,31 @@ func NewServer(version string) *httptest.Server {
 func ServerHandler(version string) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		path := strings.TrimPrefix(req.URL.EscapedPath(), "/"+version)
+		if path == "/Login/Autenticar" {
+			handleAuth(w, req)
+			return
+		}
+
+		if !isAuthenticated(req) {
+			w.Write([]byte(`{"Message": "Authorization has been denied for this request."}`))
+			return
+		}
 
 		switch path {
-		case "/Login/Autenticar":
-			handleAuth(w, req)
 		case "/Linha/Buscar":
 			handleQueryLines(w, req)
+		case "/Linha/BuscarLinhaSentido":
+			handleQueryLinesByDirecction(w, req)
 		}
 	}
+}
+
+func isAuthenticated(req *http.Request) bool {
+	if _, err := req.Cookie("apiCredentials"); err != nil {
+		return false
+	}
+
+	return true
 }
 
 func handleAuth(w http.ResponseWriter, req *http.Request) {
@@ -39,11 +56,6 @@ func handleAuth(w http.ResponseWriter, req *http.Request) {
 }
 
 func handleQueryLines(w http.ResponseWriter, req *http.Request) {
-	if _, err := req.Cookie("apiCredentials"); err != nil {
-		w.Write([]byte(`{"Message": "Authorization has been denied for this request."}`))
-		return
-	}
-
 	if req.FormValue("termosBusca") == "" {
 		w.Write([]byte(`[]`))
 		return
@@ -65,6 +77,29 @@ func handleQueryLines(w http.ResponseWriter, req *http.Request) {
 				"lc": false,
 				"lt": "8000",
 				"sl": 2,
+				"tl": 10,
+				"tp": "PCA.RAMOS DE AZEVEDO",
+				"ts": "TERMINAL LAPA"
+			}
+		]
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleQueryLinesByDirecction(w http.ResponseWriter, req *http.Request) {
+	if req.FormValue("termosBusca") == "" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		[
+			{
+				"cl": 1273,
+				"lc": false,
+				"lt": "8000",
+				"sl": 1,
 				"tl": 10,
 				"tp": "PCA.RAMOS DE AZEVEDO",
 				"ts": "TERMINAL LAPA"

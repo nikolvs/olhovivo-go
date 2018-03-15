@@ -1,11 +1,7 @@
 package olhovivo
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/url"
-
-	"github.com/pkg/errors"
 )
 
 type BusLine struct {
@@ -19,23 +15,18 @@ type BusLine struct {
 }
 
 func (ov *OlhoVivo) QueryLines(search string) (lines []BusLine, err error) {
-	resp, err := ov.request("GET", "/Linha/Buscar", url.Values{
+	err = ov.requestJSON(&lines, "GET", "/Linha/Buscar", url.Values{
 		"termosBusca": []string{search},
 	})
 
-	if err != nil {
-		return nil, err
-	}
+	return
+}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "error while reading response body")
-	}
-
-	defer resp.Body.Close()
-	if err := json.Unmarshal(body, &lines); err != nil {
-		return nil, errors.Wrap(err, "error while unmarshaling response body")
-	}
+func (ov *OlhoVivo) QueryLinesByDirection(search string, direction byte) (lines []BusLine, err error) {
+	err = ov.requestJSON(&lines, "GET", "/Linha/BuscarLinhaSentido", url.Values{
+		"termosBusca": []string{search},
+		"sentido":     []string{string(direction)},
+	})
 
 	return
 }
