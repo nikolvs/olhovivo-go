@@ -28,6 +28,8 @@ func ServerHandler(version string) http.HandlerFunc {
 			handleQueryLines(w, req)
 		case "/Linha/BuscarLinhaSentido":
 			handleQueryLinesByDirecction(w, req)
+		case "/Parada/Buscar":
+			handleQueryStops(w, req)
 		}
 	}
 }
@@ -93,6 +95,12 @@ func handleQueryLinesByDirecction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	direction := req.FormValue("sentido")
+	if direction != "1" && direction != "2" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
 	jsonString := `
 		[
 			{
@@ -104,6 +112,27 @@ func handleQueryLinesByDirecction(w http.ResponseWriter, req *http.Request) {
 				"tp": "PCA.RAMOS DE AZEVEDO",
 				"ts": "TERMINAL LAPA"
 			}
+		]
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleQueryStops(w http.ResponseWriter, req *http.Request) {
+	if req.FormValue("termosBusca") == "" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		[
+		  {
+			"cp": 340015329,
+			"np": "AFONSO BRAZ B/C1",
+			"ed": "R ARMINDA/ R BALTHAZAR DA VEIGA",
+			"py": -23.592938,
+			"px": -46.672727
+		  }
 		]
 	`
 

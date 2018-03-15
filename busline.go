@@ -2,6 +2,7 @@ package olhovivo
 
 import (
 	"net/url"
+	"strconv"
 )
 
 type BusLine struct {
@@ -22,10 +23,10 @@ func (ov *OlhoVivo) QueryLines(search string) (lines []BusLine, err error) {
 	return
 }
 
-func (ov *OlhoVivo) QueryLinesByDirection(search string, direction byte) (lines []BusLine, err error) {
+func (ov *OlhoVivo) QueryLinesByDirection(search string, direction int) (lines []BusLine, err error) {
 	err = ov.requestJSON(&lines, "GET", "/Linha/BuscarLinhaSentido", url.Values{
 		"termosBusca": []string{search},
-		"sentido":     []string{string(direction)},
+		"sentido":     []string{strconv.Itoa(direction)},
 	})
 
 	return
