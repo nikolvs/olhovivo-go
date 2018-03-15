@@ -73,10 +73,9 @@ func (ov *OlhoVivo) request(method, path string, params url.Values) (resp *http.
 		return nil, errors.Wrap(err, "error while mounting request url")
 	}
 
-	req := &http.Request{
-		Method: method,
-		URL:    parsedUrl,
-		Header: http.Header{},
+	req, err := http.NewRequest(method, parsedUrl.String(), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error while mounting http request")
 	}
 
 	return ov.httpClient.Do(req)
