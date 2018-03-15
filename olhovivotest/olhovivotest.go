@@ -12,7 +12,7 @@ func NewServer(version string) *httptest.Server {
 
 func ServerHandler(version string) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		path := strings.TrimPrefix(req.URL.Path, "/"+version)
+		path := strings.TrimPrefix(req.URL.EscapedPath(), "/"+version)
 
 		switch path {
 		case "/Login/Autenticar":
