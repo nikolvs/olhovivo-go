@@ -1,18 +1,25 @@
 package olhovivo
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"strconv"
 
 	"github.com/pkg/errors"
+	"golang.org/x/net/publicsuffix"
 )
 
 const (
 	API_URL     = "http://api.olhovivo.sptrans.com.br"
 	API_VERSION = "v2.1"
+
+	apiAuthPath = "/Login/Autenticar"
+)
+
+var (
+	ErrAuthenticationFailed = errors.New("authentication failed")
 )
 
 type OlhoVivo struct {
@@ -20,17 +27,7 @@ type OlhoVivo struct {
 	Version string
 	Token   string
 
-	client *http.Client
-}
-
-type BusLine struct {
-	Cl int    `json:"cl"`
-	Lc bool   `json:"lc"`
-	Lt string `json:"lt"`
-	Tl int    `json:"tl"`
-	Sl int    `json:"sl"`
-	Tp string `json:"tp"`
-	Ts string `json:"ts"`
+	httpClient *http.Client
 }
 
 func New(token string) *OlhoVivo {
@@ -47,7 +44,7 @@ func (ov *OlhoVivo) Authenticate() (ok bool, err error) {
 	})
 
 	if err != nil {
-		return false, errors.Wrap(err, "request error")
+		return false, err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -65,40 +62,10 @@ func (ov *OlhoVivo) Authenticate() (ok bool, err error) {
 	return
 }
 
-func (ov *OlhoVivo) QueryLines(search string) (lines []BusLine, err error) {
-	// TODO: move authentication to another place
-	ok, err := ov.Authenticate()
-	if err != nil {
-		return nil, errors.Wrap(err, "error on OlhoVivo authentication")
-	}
-	if !ok {
-		return nil, errors.New("failed to authenticate")
-	}
-
-	resp, err := ov.request("GET", "/Linha/Buscar", url.Values{
-		"termosBusca": []string{search},
-	})
-
-	if err != nil {
-		return nil, errors.Wrap(err, "request error")
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "error while reading response body")
-	}
-
-	defer resp.Body.Close()
-	if err := json.Unmarshal(body, &lines); err != nil {
-		return nil, errors.Wrap(err, "error while unmarshaling response body")
-	}
-
-	return
-}
-
 func (ov *OlhoVivo) request(method, path string, params url.Values) (resp *http.Response, err error) {
-	if ov.client == nil {
-		ov.client = &http.Client{}
+	shouldAuth := (path != apiAuthPath)
+	if err = ov.setupHttpClient(shouldAuth); err != nil {
+		return
 	}
 
 	parsedUrl, err := ov.mountUrl(path, params)
@@ -109,15 +76,44 @@ func (ov *OlhoVivo) request(method, path string, params url.Values) (resp *http.
 	req := &http.Request{
 		Method: method,
 		URL:    parsedUrl,
+		Header: http.Header{},
 	}
 
-	return ov.client.Do(req)
+	return ov.httpClient.Do(req)
+}
+
+func (ov *OlhoVivo) setupHttpClient(shouldAuth bool) (err error) {
+	if ov.httpClient != nil {
+		return
+	}
+
+	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+	if err != nil {
+		return errors.Wrap(err, "error while creating http cookiejar")
+	}
+
+	ov.httpClient = &http.Client{Jar: jar}
+
+	// prevents requesting auth route two times when calling Authenticate() directly
+	if !shouldAuth {
+		return
+	}
+
+	ok, err := ov.Authenticate()
+	if err != nil {
+		return errors.Wrap(err, "error while trying to authenticate on OlhoVivo")
+	}
+	if !ok {
+		return ErrAuthenticationFailed
+	}
+
+	return
 }
 
 func (ov *OlhoVivo) mountUrl(path string, params url.Values) (parsedUrl *url.URL, err error) {
 	parsedUrl, err = url.Parse(ov.URL)
 	if err != nil {
-		return nil, errors.Wrap(err, "error while parsing OlhoVivo url")
+		return nil, errors.Wrap(err, "error while parsing url")
 	}
 
 	parsedUrl.Path = "/" + ov.Version + path
