@@ -36,6 +36,8 @@ func ServerHandler(version string) http.HandlerFunc {
 			handleQueryStopsByCorridor(w, req)
 		case "/Corredor":
 			handleCorridors(w, req)
+		case "/Empresa":
+			handleCompanies(w, req)
 		}
 	}
 }
@@ -195,6 +197,30 @@ func handleCorridors(w http.ResponseWriter, req *http.Request) {
 		  {
 			"cc":8,
 			"nc":"Campo Limpo"
+		  }
+		]
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleCompanies(w http.ResponseWriter, req *http.Request) {
+	jsonString := `
+		[
+		  {
+			"hr":"11:20",
+			"e": [
+			  {
+				"a": 1,
+				"e": [
+				  {
+					"a": 1,
+					"c": 999,
+					"n": "NOME"
+				  }
+				]
+			  }
+			]
 		  }
 		]
 	`
