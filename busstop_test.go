@@ -26,3 +26,43 @@ func TestQueryStops(t *testing.T) {
 		t.Errorf("expected to found some bus stops, but got nothing")
 	}
 }
+
+func TestQueryStopsByLine(t *testing.T) {
+	ts := olhovivotest.NewServer(API_TEST_VERSION)
+	defer ts.Close()
+
+	ov := &olhovivo.OlhoVivo{
+		URL:     ts.URL,
+		Version: API_TEST_VERSION,
+		Token:   API_TEST_TOKEN,
+	}
+
+	stops, err := ov.QueryStopsByLine(666)
+	if err != nil {
+		t.Errorf("error while querying stops: %s", err.Error())
+	}
+
+	if len(stops) == 0 {
+		t.Errorf("expected to found some bus stops, but got nothing")
+	}
+}
+
+func TestQueryStopsByCorridor(t *testing.T) {
+	ts := olhovivotest.NewServer(API_TEST_VERSION)
+	defer ts.Close()
+
+	ov := &olhovivo.OlhoVivo{
+		URL:     ts.URL,
+		Version: API_TEST_VERSION,
+		Token:   API_TEST_TOKEN,
+	}
+
+	stops, err := ov.QueryStopsByCorridor(19)
+	if err != nil {
+		t.Errorf("error while querying stops: %s", err.Error())
+	}
+
+	if len(stops) == 0 {
+		t.Errorf("expected to found some bus stops, but got nothing")
+	}
+}

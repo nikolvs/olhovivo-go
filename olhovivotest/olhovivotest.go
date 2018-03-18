@@ -30,6 +30,10 @@ func ServerHandler(version string) http.HandlerFunc {
 			handleQueryLinesByDirecction(w, req)
 		case "/Parada/Buscar":
 			handleQueryStops(w, req)
+		case "/Parada/BuscarParadasPorLinha":
+			handleQueryStopsByLine(w, req)
+		case "/Parada/BuscarParadasPorCorredor":
+			handleQueryStopsByCorridor(w, req)
 		}
 	}
 }
@@ -120,6 +124,50 @@ func handleQueryLinesByDirecction(w http.ResponseWriter, req *http.Request) {
 
 func handleQueryStops(w http.ResponseWriter, req *http.Request) {
 	if req.FormValue("termosBusca") == "" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		[
+		  {
+			"cp": 340015329,
+			"np": "AFONSO BRAZ B/C1",
+			"ed": "R ARMINDA/ R BALTHAZAR DA VEIGA",
+			"py": -23.592938,
+			"px": -46.672727
+		  }
+		]
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleQueryStopsByLine(w http.ResponseWriter, req *http.Request) {
+	lineCode := req.FormValue("codigoLinha")
+	if lineCode == "" || lineCode == "0" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		[
+		  {
+			"cp": 340015329,
+			"np": "AFONSO BRAZ B/C1",
+			"ed": "R ARMINDA/ R BALTHAZAR DA VEIGA",
+			"py": -23.592938,
+			"px": -46.672727
+		  }
+		]
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleQueryStopsByCorridor(w http.ResponseWriter, req *http.Request) {
+	lineCode := req.FormValue("codigoCorredor")
+	if lineCode == "" || lineCode == "0" {
 		w.Write([]byte(`[]`))
 		return
 	}
