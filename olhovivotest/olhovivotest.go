@@ -34,6 +34,8 @@ func ServerHandler(version string) http.HandlerFunc {
 			handleQueryStopsByLine(w, req)
 		case "/Parada/BuscarParadasPorCorredor":
 			handleQueryStopsByCorridor(w, req)
+		case "/Corredor":
+			handleCorridors(w, req)
 		}
 	}
 }
@@ -180,6 +182,19 @@ func handleQueryStopsByCorridor(w http.ResponseWriter, req *http.Request) {
 			"ed": "R ARMINDA/ R BALTHAZAR DA VEIGA",
 			"py": -23.592938,
 			"px": -46.672727
+		  }
+		]
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleCorridors(w http.ResponseWriter, req *http.Request) {
+	jsonString := `
+		[
+		  {
+			"cc":8,
+			"nc":"Campo Limpo"
 		  }
 		]
 	`
