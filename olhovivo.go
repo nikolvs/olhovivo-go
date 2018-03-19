@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"strconv"
 
 	"github.com/pkg/errors"
 	"golang.org/x/net/publicsuffix"
@@ -40,30 +39,14 @@ func New(token string) *OlhoVivo {
 }
 
 func (ov *OlhoVivo) Authenticate() (ok bool, err error) {
-	resp, err := ov.request("POST", "/Login/Autenticar", url.Values{
+	err = ov.request(&ok, "POST", "/Login/Autenticar", url.Values{
 		"token": []string{ov.Token},
 	})
-
-	if err != nil {
-		return false, err
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return false, errors.Wrap(err, "error while reading response body")
-	}
-
-	defer resp.Body.Close()
-
-	ok, err = strconv.ParseBool(string(body))
-	if err != nil {
-		return false, errors.Wrap(err, "error while parsing response body")
-	}
 
 	return
 }
 
-func (ov *OlhoVivo) request(method, path string, params url.Values) (resp *http.Response, err error) {
+func (ov *OlhoVivo) request(v interface{}, method, path string, params url.Values) (err error) {
 	shouldAuth := (path != apiAuthPath)
 	if err = ov.setupHttpClient(shouldAuth); err != nil {
 		return
@@ -71,21 +54,17 @@ func (ov *OlhoVivo) request(method, path string, params url.Values) (resp *http.
 
 	parsedUrl, err := ov.mountUrl(path, params)
 	if err != nil {
-		return nil, errors.Wrap(err, "error while mounting request url")
+		return errors.Wrap(err, "error while mounting request url")
 	}
 
 	req, err := http.NewRequest(method, parsedUrl.String(), nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error while mounting http request")
+		return errors.Wrap(err, "error while mounting http request")
 	}
 
-	return ov.httpClient.Do(req)
-}
-
-func (ov *OlhoVivo) requestJSON(v interface{}, method, path string, params url.Values) (err error) {
-	resp, err := ov.request(method, path, params)
+	resp, err := ov.httpClient.Do(req)
 	if err != nil {
-		return
+		return errors.Wrap(err, "error while sending http request")
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)

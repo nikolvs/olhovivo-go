@@ -14,7 +14,7 @@ type BusStop struct {
 }
 
 func (ov *OlhoVivo) QueryStops(search string) (stops []BusStop, err error) {
-	err = ov.requestJSON(&stops, "GET", "/Parada/Buscar", url.Values{
+	err = ov.request(&stops, "GET", "/Parada/Buscar", url.Values{
 		"termosBusca": []string{search},
 	})
 
@@ -22,7 +22,7 @@ func (ov *OlhoVivo) QueryStops(search string) (stops []BusStop, err error) {
 }
 
 func (ov *OlhoVivo) QueryStopsByLine(lineCode int) (stops []BusStop, err error) {
-	err = ov.requestJSON(&stops, "GET", "/Parada/BuscarParadasPorLinha", url.Values{
+	err = ov.request(&stops, "GET", "/Parada/BuscarParadasPorLinha", url.Values{
 		"codigoLinha": []string{strconv.Itoa(lineCode)},
 	})
 
@@ -30,7 +30,7 @@ func (ov *OlhoVivo) QueryStopsByLine(lineCode int) (stops []BusStop, err error) 
 }
 
 func (ov *OlhoVivo) QueryStopsByCorridor(corridorCode int) (stops []BusStop, err error) {
-	err = ov.requestJSON(&stops, "GET", "/Parada/BuscarParadasPorCorredor", url.Values{
+	err = ov.request(&stops, "GET", "/Parada/BuscarParadasPorCorredor", url.Values{
 		"codigoCorredor": []string{strconv.Itoa(corridorCode)},
 	})
 

@@ -6,6 +6,6 @@ type BusCorridor struct {
 }
 
 func (ov *OlhoVivo) Corridors() (corridors []BusCorridor, err error) {
-	err = ov.requestJSON(&corridors, "GET", "/Corredor", nil)
+	err = ov.request(&corridors, "GET", "/Corredor", nil)
 	return
 }

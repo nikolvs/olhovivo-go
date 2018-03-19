@@ -17,6 +17,6 @@ type BusCompany struct {
 }
 
 func (ov *OlhoVivo) Companies() (companies []BusCompanyInfo, err error) {
-	err = ov.requestJSON(&companies, "GET", "/Empresa", nil)
+	err = ov.request(&companies, "GET", "/Empresa", nil)
 	return
 }
