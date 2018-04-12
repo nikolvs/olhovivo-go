@@ -10,6 +10,11 @@ type BusPrevisions struct {
 	P  BusStopPrevision `json:"p"`
 }
 
+type BusStopPrevisions struct {
+	Hr string           `json:"hr"`
+	P  BusStopPrevision `json:"p"`
+}
+
 type BusStopPrevision struct {
 	Cp int                   `json:"cp"`
 	Np string                `json:"np"`
@@ -21,11 +26,6 @@ type BusStopPrevision struct {
 type BusLinePrevisions struct {
 	Hr string             `json:"hr"`
 	Ps []BusStopPrevision `json:"ps"`
-}
-
-type BusStopPrevisions struct {
-	Hr string           `json:"hr"`
-	P  BusStopPrevision `json:"p"`
 }
 
 func (ov *OlhoVivo) Previsions(stopCode, lineCode int) (previsions BusPrevisions, err error) {
