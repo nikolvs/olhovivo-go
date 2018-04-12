@@ -1,6 +1,11 @@
 package olhovivo
 
-type BusPositionInfo struct {
+import (
+	"net/url"
+	"strconv"
+)
+
+type BusPositions struct {
 	Hr string                `json:"hr"`
 	L  []BusLineLocalization `json:"l"`
 }
@@ -23,7 +28,20 @@ type BusLocalization struct {
 	Px float64 `json:"px"`
 }
 
-func (ov *OlhoVivo) Positions() (positions BusPositionInfo, err error) {
+type BusLinePositions struct {
+	Hr string            `json:"hr"`
+	Vs []BusLocalization `json:"vs"`
+}
+
+func (ov *OlhoVivo) Positions() (positions BusPositions, err error) {
 	err = ov.request(&positions, "GET", "/Posicao", nil)
+	return
+}
+
+func (ov *OlhoVivo) LinePositions(lineCode int) (positions BusLinePositions, err error) {
+	err = ov.request(&positions, "GET", "/Posicao/Linha", url.Values{
+		"codigoLinha": []string{strconv.Itoa(lineCode)},
+	})
+
 	return
 }

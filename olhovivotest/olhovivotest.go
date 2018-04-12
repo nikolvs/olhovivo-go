@@ -40,6 +40,8 @@ func ServerHandler(version string) http.HandlerFunc {
 			handleCompanies(w, req)
 		case "/Posicao":
 			handlePositions(w, req)
+		case "/Posicao/Linha":
+			handleLinePositions(w, req)
 		}
 	}
 }
@@ -172,8 +174,8 @@ func handleQueryStopsByLine(w http.ResponseWriter, req *http.Request) {
 }
 
 func handleQueryStopsByCorridor(w http.ResponseWriter, req *http.Request) {
-	lineCode := req.FormValue("codigoCorredor")
-	if lineCode == "" || lineCode == "0" {
+	corridorCode := req.FormValue("codigoCorredor")
+	if corridorCode == "" || corridorCode == "0" {
 		w.Write([]byte(`[]`))
 		return
 	}
@@ -251,6 +253,31 @@ func handlePositions(w http.ResponseWriter, req *http.Request) {
 				  "px":-46.65674
 				}
 			  ]
+			}
+		  ]
+		}
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleLinePositions(w http.ResponseWriter, req *http.Request) {
+	lineCode := req.FormValue("codigoLinha")
+	if lineCode == "" || lineCode == "0" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		{
+		  "hr": "19:57",
+		  "vs": [
+			{
+			  "p": 11433,
+			  "a": false,
+			  "ta": "2017-05-07T22:57:02Z",
+			  "py": -23.540150375000003,
+			  "px": -46.64414075
 			}
 		  ]
 		}
