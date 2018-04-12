@@ -46,3 +46,23 @@ func TestLinePrevisions(t *testing.T) {
 		t.Errorf("expected to found some bus stops, but got nothing")
 	}
 }
+
+func TestStopPrevisions(t *testing.T) {
+	ts := olhovivotest.NewServer(API_TEST_VERSION)
+	defer ts.Close()
+
+	ov := &olhovivo.OlhoVivo{
+		URL:     ts.URL,
+		Version: API_TEST_VERSION,
+		Token:   API_TEST_TOKEN,
+	}
+
+	previsions, err := ov.StopPrevisions(666)
+	if err != nil {
+		t.Errorf("error while fetching previsions: %s", err.Error())
+	}
+
+	if len(previsions.P.L) == 0 {
+		t.Errorf("expected to found some bus lines, but got nothing")
+	}
+}

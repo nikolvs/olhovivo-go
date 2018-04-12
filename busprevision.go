@@ -23,6 +23,11 @@ type BusLinePrevisions struct {
 	Ps []BusStopPrevision `json:"ps"`
 }
 
+type BusStopPrevisions struct {
+	Hr string           `json:"hr"`
+	P  BusStopPrevision `json:"p"`
+}
+
 func (ov *OlhoVivo) Previsions(stopCode, lineCode int) (previsions BusPrevisions, err error) {
 	err = ov.request(&previsions, "GET", "/Previsao", url.Values{
 		"codigoParada": []string{strconv.Itoa(stopCode)},
@@ -35,6 +40,14 @@ func (ov *OlhoVivo) Previsions(stopCode, lineCode int) (previsions BusPrevisions
 func (ov *OlhoVivo) LinePrevisions(lineCode int) (previsions BusLinePrevisions, err error) {
 	err = ov.request(&previsions, "GET", "/Previsao/Linha", url.Values{
 		"codigoLinha": []string{strconv.Itoa(lineCode)},
+	})
+
+	return
+}
+
+func (ov *OlhoVivo) StopPrevisions(stopCode int) (previsions BusStopPrevisions, err error) {
+	err = ov.request(&previsions, "GET", "/Previsao/Parada", url.Values{
+		"codigoParada": []string{strconv.Itoa(stopCode)},
 	})
 
 	return

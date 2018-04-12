@@ -52,6 +52,8 @@ func ServerHandler(version string) http.HandlerFunc {
 			handlePrevisions(w, req)
 		case "/Previsao/Linha":
 			handleLinePrevisions(w, req)
+		case "/Previsao/Parada":
+			handleStopPrevisions(w, req)
 		}
 	}
 }
@@ -407,6 +409,48 @@ func handleLinePrevisions(w http.ResponseWriter, req *http.Request) {
 			  ]
 			}
 		  ]
+		}
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleStopPrevisions(w http.ResponseWriter, req *http.Request) {
+	stopCode := req.FormValue("codigoParada")
+	if stopCode == "" || stopCode == "0" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		{
+		  "hr": "20:20",
+		  "p": {
+			"cp": 4200953,
+			"np": "PARADA ROBERTO SELMI DEI B/C",
+			"py": -23.675901,
+			"px": -46.752812,
+			"l": [
+			  {
+				"c": "675K-10",
+				"cl": 198,
+				"sl": 1,
+				"lt0": "METRO STA CRUZ",
+				"lt1": "TERM. JD. ANGELA",
+				"qv": 1,
+				"vs": [
+				  {
+					"p": 73651,
+					"t": "23:22",
+					"a": true,
+					"ta": "2017-05-07T23:20:06Z",
+					"py": -23.676623333333335,
+					"px": -46.757641666666665
+				  }
+				]
+			  }
+			]
+		  }
 		}
 	`
 
