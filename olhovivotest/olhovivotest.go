@@ -38,6 +38,8 @@ func ServerHandler(version string) http.HandlerFunc {
 			handleCorridors(w, req)
 		case "/Empresa":
 			handleCompanies(w, req)
+		case "/Posicao":
+			handlePositions(w, req)
 		}
 	}
 }
@@ -223,6 +225,35 @@ func handleCompanies(w http.ResponseWriter, req *http.Request) {
 			]
 		  }
 		]
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handlePositions(w http.ResponseWriter, req *http.Request) {
+	jsonString := `
+		{
+		  "hr": "11:30",
+		  "l": [
+			{
+			  "c": "5015-10",
+			  "cl": 33887,
+			  "sl": 2,
+			  "lt0": "METRÔ JABAQUARA",
+			  "lt1": "JD. SÃO JORGE",
+			  "qv": 1,
+			  "vs": [
+				{
+				  "p":68021,
+				  "a":true,
+				  "ta":"2017-05-12T14:30:37Z",
+				  "py":-23.678712500000003,
+				  "px":-46.65674
+				}
+			  ]
+			}
+		  ]
+		}
 	`
 
 	w.Write([]byte(jsonString))
