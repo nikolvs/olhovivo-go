@@ -13,13 +13,17 @@ func NewServer(version string) *httptest.Server {
 func ServerHandler(version string) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		path := strings.TrimPrefix(req.URL.EscapedPath(), "/"+version)
-		if path == "/Login/Autenticar" {
+		if req.Method == "POST" && path == "/Login/Autenticar" {
 			handleAuth(w, req)
 			return
 		}
 
 		if !isAuthenticated(req) {
 			w.Write([]byte(`{"Message": "Authorization has been denied for this request."}`))
+			return
+		}
+
+		if req.Method != "GET" {
 			return
 		}
 
@@ -42,6 +46,8 @@ func ServerHandler(version string) http.HandlerFunc {
 			handlePositions(w, req)
 		case "/Posicao/Linha":
 			handleLinePositions(w, req)
+		case "/Posicao/Garagem":
+			handleGaragePositions(w, req)
 		}
 	}
 }
@@ -278,6 +284,41 @@ func handleLinePositions(w http.ResponseWriter, req *http.Request) {
 			  "ta": "2017-05-07T22:57:02Z",
 			  "py": -23.540150375000003,
 			  "px": -46.64414075
+			}
+		  ]
+		}
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleGaragePositions(w http.ResponseWriter, req *http.Request) {
+	companyCode := req.FormValue("codigoEmpresa")
+	if companyCode == "" || companyCode == "0" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		{
+		  "hr": "11:30",
+		  "l": [
+			{
+			  "c": "5015-10",
+			  "cl": 33887,
+			  "sl": 2,
+			  "lt0": "METRÔ JABAQUARA",
+			  "lt1": "JD. SÃO JORGE",
+			  "qv": 1,
+			  "vs": [
+				{
+				  "p":68021,
+				  "a":true,
+				  "ta":"2017-05-12T14:30:37Z",
+				  "py":-23.678712500000003,
+				  "px":-46.65674
+				}
+			  ]
 			}
 		  ]
 		}

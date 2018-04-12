@@ -45,3 +45,16 @@ func (ov *OlhoVivo) LinePositions(lineCode int) (positions BusLinePositions, err
 
 	return
 }
+
+func (ov *OlhoVivo) GaragePositions(companyCode int, lineCode ...int) (positions BusPositions, err error) {
+	params := url.Values{
+		"codigoEmpresa": []string{strconv.Itoa(companyCode)},
+	}
+
+	if len(lineCode) != 0 {
+		params["codigoLinha"] = []string{strconv.Itoa(lineCode[0])}
+	}
+
+	err = ov.request(&positions, "GET", "/Posicao/Garagem", params)
+	return
+}
