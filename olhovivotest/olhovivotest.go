@@ -48,6 +48,10 @@ func ServerHandler(version string) http.HandlerFunc {
 			handleLinePositions(w, req)
 		case "/Posicao/Garagem":
 			handleGaragePositions(w, req)
+		case "/Previsao":
+			handlePrevisions(w, req)
+		case "/Previsao/Linha":
+			handleLinePrevisions(w, req)
 		}
 	}
 }
@@ -317,6 +321,88 @@ func handleGaragePositions(w http.ResponseWriter, req *http.Request) {
 				  "ta":"2017-05-12T14:30:37Z",
 				  "py":-23.678712500000003,
 				  "px":-46.65674
+				}
+			  ]
+			}
+		  ]
+		}
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handlePrevisions(w http.ResponseWriter, req *http.Request) {
+	stopCode := req.FormValue("codigoParada")
+	if stopCode == "" || stopCode == "0" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	lineCode := req.FormValue("codigoLinha")
+	if lineCode == "" || lineCode == "0" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		{
+		  "hr": "20:09",
+		  "p": {
+			"cp": 4200953,
+			"np": "PARADA ROBERTO SELMI DEI B/C",
+			"py": -23.675901,
+			"px": -46.752812,
+			"l": [
+			  {
+				"c": "7021-10",
+				"cl": 1989,
+				"sl": 1,
+				"lt0": "TERM. JOÃO DIAS",
+				"lt1": "JD. MARACÁ",
+				"qv": 1,
+				"vs": [
+				  {
+					"p": 74558,
+					"t": "23:11",
+					"a": true,
+					"ta": "2017-05-07T23:09:05Z",
+					"py": -23.67603,
+					"px": -46.75891166666667
+				  }
+				]
+			  }
+			]
+		  }
+		}
+	`
+
+	w.Write([]byte(jsonString))
+}
+
+func handleLinePrevisions(w http.ResponseWriter, req *http.Request) {
+	lineCode := req.FormValue("codigoLinha")
+	if lineCode == "" || lineCode == "0" {
+		w.Write([]byte(`[]`))
+		return
+	}
+
+	jsonString := `
+		{
+		  "hr": "20:18",
+		  "ps": [
+			{
+			  "cp": 700016623,
+			  "np": "ANA CINTRA B/C",
+			  "py": -23.538763,
+			  "px": -46.646925,
+			  "vs": [
+				{
+				  "p": "11436",
+				  "t": "23:26",
+				  "a": false,
+				  "ta": "2017-05-07T23:18:02Z",
+				  "py": -23.528119999999998,
+				  "px": -46.670674999999996
 				}
 			  ]
 			}
