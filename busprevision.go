@@ -32,7 +32,7 @@ type BusLinePrevision struct {
 }
 
 type BusPrevisionLocalization struct {
-	P  int     `json:"p"`
+	P  string  `json:"p"`
 	T  string  `json:"t"`
 	A  bool    `json:"a"`
 	Ta string  `json:"ta"`

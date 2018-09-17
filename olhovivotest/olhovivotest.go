@@ -399,7 +399,7 @@ func handleLinePrevisions(w http.ResponseWriter, req *http.Request) {
 			  "px": -46.646925,
 			  "vs": [
 				{
-				  "p": 11436,
+				  "p": "11436",
 				  "t": "23:26",
 				  "a": false,
 				  "ta": "2017-05-07T23:18:02Z",
