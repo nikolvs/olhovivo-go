@@ -23,9 +23,26 @@ type BusStopPrevision struct {
 	L  []BusLineLocalization `json:"l"`
 }
 
+type BusLinePrevision struct {
+	Cp int                        `json:"cp"`
+	Np string                     `json:"np"`
+	Py float64                    `json:"py"`
+	Px float64                    `json:"px"`
+	Vs []BusPrevisionLocalization `json:"vs"`
+}
+
+type BusPrevisionLocalization struct {
+	P  int     `json:"p"`
+	T  string  `json:"t"`
+	A  bool    `json:"a"`
+	Ta string  `json:"ta"`
+	Py float64 `json:"py"`
+	Px float64 `json:"px"`
+}
+
 type BusLinePrevisions struct {
 	Hr string             `json:"hr"`
-	Ps []BusStopPrevision `json:"ps"`
+	Ps []BusLinePrevision `json:"ps"`
 }
 
 func (ov *OlhoVivo) Previsions(stopCode, lineCode int) (previsions BusPrevisions, err error) {
